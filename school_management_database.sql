@@ -100,14 +100,19 @@ CREATE TABLE parents(
 
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
-    student_id INT NULL,
-    teacher_id INT NULL,
+    student_id INT,
+    teacher_id INT,
     username VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role VARCHAR(20) NOT NULL, -- e.g., 'student', 'teacher', 'admin'
+    role VARCHAR(20) NOT NULL, -- 'student', 'teacher', 'admin'
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (student_id) REFERENCES student(student_id),
-    FOREIGN KEY (teacher_id) REFERENCES teacher(teacher_id)
+    FOREIGN KEY (teacher_id) REFERENCES teacher(teacher_id),
+    CHECK (
+        (student_id IS NOT NULL AND teacher_id IS NULL AND role = 'student') OR
+        (teacher_id IS NOT NULL AND student_id IS NULL AND role = 'teacher') OR
+        (student_id IS NULL AND teacher_id IS NULL AND role = 'admin')
+    )
 );
 
 
