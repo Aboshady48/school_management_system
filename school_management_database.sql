@@ -1,6 +1,7 @@
 CREATE DATABASE school_management_database;
 
 
+
 CREATE TABLE student (
     student_id INT PRIMARY KEY,
     f_name VARCHAR(100),
@@ -94,6 +95,19 @@ CREATE TABLE parents(
     phone_number VARCHAR(15),
     email VARCHAR(100),
     FOREIGN KEY (student_id) REFERENCES student(student_id)
+);
+
+
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,
+    student_id INT NULL,
+    teacher_id INT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL, -- e.g., 'student', 'teacher', 'admin'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES student(student_id),
+    FOREIGN KEY (teacher_id) REFERENCES teacher(teacher_id)
 );
 
 
