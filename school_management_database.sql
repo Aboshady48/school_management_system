@@ -1,7 +1,12 @@
+-- Create the database
 CREATE DATABASE school_management_database;
+GO
 
+-- Use the new database
+USE school_management_database;
+GO
 
-
+-- Create the student table
 CREATE TABLE student (
     student_id INT PRIMARY KEY,
     f_name VARCHAR(100),
@@ -14,8 +19,8 @@ CREATE TABLE student (
     university_email VARCHAR(100)
 );
 
-
-CREATE TABLE teacher(
+-- Create the teacher table
+CREATE TABLE teacher (
     teacher_id INT PRIMARY KEY,
     full_name VARCHAR(100),
     subject VARCHAR(100),
@@ -23,7 +28,8 @@ CREATE TABLE teacher(
     email VARCHAR(100)
 );
 
-CREATE TABLE subject(
+-- Create the subject table
+CREATE TABLE subject (
     subject_id INT PRIMARY KEY,
     subject_name VARCHAR(100) NOT NULL,
     subject_code VARCHAR(20) NOT NULL,
@@ -31,7 +37,8 @@ CREATE TABLE subject(
     FOREIGN KEY (teacher_id) REFERENCES teacher(teacher_id)
 );
 
-CREATE TABLE class(
+-- Create the class table
+CREATE TABLE class (
     class_id INT PRIMARY KEY,
     class_name VARCHAR(100) NOT NULL,
     class_code VARCHAR(20) NOT NULL,
@@ -39,7 +46,8 @@ CREATE TABLE class(
     FOREIGN KEY (teacher_id) REFERENCES teacher(teacher_id)
 );
 
-CREATE TABLE attendance(
+-- Create the attendance table
+CREATE TABLE attendance (
     attendance_id INT PRIMARY KEY,
     student_id INT,
     class_id INT,
@@ -49,7 +57,8 @@ CREATE TABLE attendance(
     FOREIGN KEY (class_id) REFERENCES class(class_id)
 );
 
-CREATE TABLE grades(
+-- Create the grades table
+CREATE TABLE grades (
     grade_id INT PRIMARY KEY,
     student_id INT,
     subject_id INT,
@@ -60,7 +69,8 @@ CREATE TABLE grades(
     FOREIGN KEY (class_id) REFERENCES class(class_id)
 );
 
-CREATE TABLE exam(
+-- Create the exam table
+CREATE TABLE exam (
     exam_id INT PRIMARY KEY,
     subject_id INT,
     class_id INT,
@@ -69,7 +79,8 @@ CREATE TABLE exam(
     FOREIGN KEY (class_id) REFERENCES class(class_id)
 );
 
-CREATE TABLE exam_results(
+-- Create the exam_results table
+CREATE TABLE exam_results (
     result_id INT PRIMARY KEY,
     exam_id INT,
     student_id INT,
@@ -78,17 +89,19 @@ CREATE TABLE exam_results(
     FOREIGN KEY (student_id) REFERENCES student(student_id)
 );
 
-CREATE TABLE schedule(
+-- Create the schedule table
+CREATE TABLE schedule (
     schedule_id INT PRIMARY KEY,
-    class_id INT REFERENCES class(class_id),
-    teacher_id INT REFERENCES teacher(teacher_id),
-    subject_id INT REFERENCES subject(subject_id),
+    class_id INT FOREIGN KEY REFERENCES class(class_id),
+    teacher_id INT FOREIGN KEY REFERENCES teacher(teacher_id),
+    subject_id INT FOREIGN KEY REFERENCES subject(subject_id),
     start_time TIME,
     end_time TIME,
     day_of_week VARCHAR(10)
 );
 
-CREATE TABLE parents(
+-- Create the parents table
+CREATE TABLE parents (
     parent_id INT PRIMARY KEY,
     student_id INT,
     full_name VARCHAR(100),
@@ -97,15 +110,15 @@ CREATE TABLE parents(
     FOREIGN KEY (student_id) REFERENCES student(student_id)
 );
 
-
+-- Create the users table (fixed for SQL Server)
 CREATE TABLE users (
-    user_id SERIAL PRIMARY KEY,
+    user_id INT IDENTITY(1,1) PRIMARY KEY,
     student_id INT,
     teacher_id INT,
     username VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(20) NOT NULL, -- 'student', 'teacher', 'admin'
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (student_id) REFERENCES student(student_id),
     FOREIGN KEY (teacher_id) REFERENCES teacher(teacher_id),
     CHECK (
@@ -115,9 +128,7 @@ CREATE TABLE users (
     )
 );
 
-
-
---data insertion
+-- Insert student data
 INSERT INTO student (student_id, f_name, l_name, birth_date, class_id, gender, address, phone_number, university_email) VALUES
 (1, 'Ahmed', 'Ali', '2007-04-10', 1, 'Male', '10 Sidi Gaber, Alexandria', '01001234567', 'ahmed.ali@school.edu'),
 (2, 'Salma', 'Hassan', '2006-11-22', 1, 'Female', '15 Miami, Alexandria', '01002345678', 'salma.hassan@school.edu'),
@@ -140,9 +151,10 @@ INSERT INTO student (student_id, f_name, l_name, birth_date, class_id, gender, a
 (19, 'Yara', 'Samir', '2007-10-20', 3, 'Female', '52 Al Hadra, Alexandria', '01019012345', 'yara.samir@school.edu'),
 (20, 'Omar', 'Reda', '2006-08-08', 1, 'Male', '60 Dekheila, Alexandria', '01020123456', 'omar.reda@school.edu');
 
+-- Select statement to view student data
 SELECT 
     student_id,
-    f_name + ' ' + l_name AS full_name,
+    ISNULL(f_name, '') + ' ' + ISNULL(l_name, '') AS full_name,
     gender,
     birth_date,
     address,
